@@ -1,0 +1,8 @@
+
+fastapi
+uvicorn
+gunicorn
+pydantic
+sqlalchemy
+python-jose
+psycopg2-binary
