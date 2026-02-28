@@ -1,0 +1,9 @@
+# Dependencies
+/ultranova-next/node_modules
+/ultranova-backend/venv
+/ultranova-backend/__pycache__
+/ultranova-backend/*.pyc
+.env
+.DS_Store
+/ultranova-next/.next
+/ultranova-next/out
