@@ -106,35 +106,25 @@ function RevealSection({ children, delay = 0, className = '' }: { children: Reac
 
 export default function Home() {
   const [hoveredOrb, setHoveredOrb] = useState<number | null>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const handleMouse = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY })
-    }
-    window.addEventListener('mousemove', handleMouse)
-    return () => window.removeEventListener('mousemove', handleMouse)
-  }, [])
 
   return (
     <>
       {/* ═══════ HERO SECTION ═══════ */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px', overflow: 'hidden' }}>
         {/* Ambient gradient behind hero */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 800,
-            height: 800,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(108,59,255,0.08) 0%, transparent 70%)',
-            left: '50%',
-            top: '50%',
-            transform: `translate(calc(-50% + ${(mousePos.x - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)) * 0.02}px), calc(-50% + ${(mousePos.y - (typeof window !== 'undefined' ? window.innerHeight / 2 : 0)) * 0.02}px))`,
-            transition: 'transform 0.3s ease-out',
-            pointerEvents: 'none',
-          }}
-        />
+<div
+  style={{
+    position: 'absolute',
+    width: 800,
+    height: 800,
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(108,59,255,0.08) 0%, transparent 70%)',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',  // Fixed position, no mouse tracking
+    pointerEvents: 'none',
+  }}
+/>
 
         <div style={{ position: 'relative', textAlign: 'center', maxWidth: 960, margin: '0 auto', zIndex: 3 }}>
           {/* Eyebrow */}
