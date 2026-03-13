@@ -123,14 +123,15 @@ const handleThink = async () => {
     setAgentData(transformedData.agents);
     
     // Update agentStates for the left panel
-    const updatedAgentStates = [
-      { type: 'marketing', status: transformedData.agents.marketing.status === 'Active' ? 'active' : 'idle', stance: transformedData.agents.marketing.stance, message: transformedData.agents.marketing.message },
-      { type: 'product', status: transformedData.agents.product.status === 'Active' ? 'active' : 'idle', stance: transformedData.agents.product.stance, message: transformedData.agents.product.message },
-      { type: 'sales', status: transformedData.agents.sales.status === 'Active' ? 'active' : 'idle', stance: transformedData.agents.sales.stance, message: transformedData.agents.sales.message },
-      { type: 'tech', status: transformedData.agents.tech.status === 'Active' ? 'active' : 'idle', stance: transformedData.agents.tech.stance, message: transformedData.agents.tech.message },
-      { type: 'ops', status: transformedData.agents.ops.status === 'Active' ? 'active' : 'idle', stance: transformedData.agents.ops.stance, message: transformedData.agents.ops.message },
-    ];
-    setAgentStates(updatedAgentStates);
+const updatedAgentStates = [
+  { type: 'marketing' as AgentType, status: (transformedData.agents.marketing.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.marketing.stance, message: transformedData.agents.marketing.message },
+  { type: 'product' as AgentType, status: (transformedData.agents.product.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.product.stance, message: transformedData.agents.product.message },
+  { type: 'sales' as AgentType, status: (transformedData.agents.sales.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.sales.stance, message: transformedData.agents.sales.message },
+  { type: 'tech' as AgentType, status: (transformedData.agents.tech.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.tech.stance, message: transformedData.agents.tech.message },
+  { type: 'ops' as AgentType, status: (transformedData.agents.ops.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.ops.stance, message: transformedData.agents.ops.message },
+];
+
+setAgentStates(updatedAgentStates);
     
     // Update decision data
     setDecisionSpace(transformedData.decision);
