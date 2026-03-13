@@ -126,7 +126,7 @@ export default function RoadmapPage() {
 
                             <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 12 }}>Key Tasks</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-                                {(activeData?.tasks || []).map((task, i) => (
+                                {(activeData?.tasks || []).map((task: any, i: number) => (
                                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 8, background: 'var(--hover-bg)', border: '1px solid var(--border-subtle)' }}>
                                         <div style={{
                                             width: 20, height: 20, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
