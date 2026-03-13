@@ -138,15 +138,15 @@ export default function WaitlistPage() {
             console.log('Success:', response.data)
             setStatus('success')
             setFormData({ name: '', email: '', role: '', idea_description: '', stage: '' })
-        } catch (error: unknown) {
-            console.error('Error:', error)
-            if (axios.isAxiosError(error)) {
-                setErrorMsg(error.response?.data?.detail || 'Something went wrong')
-            } else {
-                setErrorMsg('Something went wrong')
-            }
-            setStatus('error')
-        }
+        } catch (error: any) {
+
+    if (error.response) {
+        setErrorMsg(error.response.data.detail)
+    } else {
+        setErrorMsg("Something went wrong")
+    }
+
+}
     }
 
     const inputStyle: React.CSSProperties = {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GlassPanel from '../components/GlassPanel'
 import ConfidenceBar from '../components/ConfidenceBar'
 
@@ -21,7 +21,35 @@ const TEAM_ALIGNMENT = [
 
 export default function RoadmapPage() {
     const [activeMilestone, setActiveMilestone] = useState<string | null>('mvp')
-    const activeData = MILESTONES.find((m) => m.id === activeMilestone)
+    const [roadmapAI, setRoadmapAI] = useState<any>(null)
+    const [idea] = useState("AI startup assistant")
+    const activeData = roadmapAI?.[activeMilestone] || MILESTONES.find((m) => m.id === activeMilestone)
+
+const getRoadmap = async () => {
+    try {
+        const res = await fetch("http://localhost:8000/founder/roadmap", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ idea })
+        })
+
+        const data = await res.json()
+        console.log("AI Roadmap:", data)
+
+        setRoadmapAI(data)
+
+    } catch (err) {
+        console.error("Roadmap AI error:", err)
+    }
+}
+
+useEffect(() => {
+    getRoadmap()
+}, [])
+
+
 
     return (
         <div style={{ position: 'relative', minHeight: '100vh', padding: '24px 16px', zIndex: 2 }}>
@@ -94,7 +122,7 @@ export default function RoadmapPage() {
 
                             <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 12 }}>Key Tasks</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-                                {activeData.tasks.map((task, i) => (
+                                {(activeData?.tasks || []).map((task, i) => (
                                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 8, background: 'var(--hover-bg)', border: '1px solid var(--border-subtle)' }}>
                                         <div style={{
                                             width: 20, height: 20, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -111,7 +139,7 @@ export default function RoadmapPage() {
 
                             <h4 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 12 }}>Agent Alignment</h4>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                {Object.entries(activeData.agents).map(([agent, s]) => (
+                                {Object.entries(activeData?.agents || {}).map(([agent, s]) => (
                                     <div key={agent} style={{
                                         display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 999, fontSize: 12,
                                         background: s === 'ok' ? 'rgba(0,255,157,0.06)' : 'rgba(255,107,59,0.06)',
@@ -130,11 +158,13 @@ export default function RoadmapPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                     <GlassPanel style={{ padding: 24 }}>
                         <h3 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: 16 }}>Risk Forecast</h3>
-                        <ConfidenceBar value={78} label="Overall Confidence" color="#6C3BFF" />
+                        <ConfidenceBar value={activeData?.confidence || 78} label="Overall Confidence" color="#6C3BFF" />
                         <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <ConfidenceBar value={92} label="Technical Feasibility" color="#00A3FF" size="sm" />
-                            <ConfidenceBar value={64} label="Market Timing" color="#FF6B3B" size="sm" />
-                            <ConfidenceBar value={85} label="Team Readiness" color="#00FF9D" size="sm" />
+                            <ConfidenceBar value={activeData?.technical_feasibility || 92} label="Technical Feasibility" color="#00A3FF" size="sm" />
+
+<ConfidenceBar value={activeData?.market_timing || 64} label="Market Timing" color="#FF6B3B" size="sm" />
+
+<ConfidenceBar value={activeData?.team_readiness || 85} label="Team Readiness" color="#00FF9D" size="sm" />
                         </div>
                     </GlassPanel>
 
