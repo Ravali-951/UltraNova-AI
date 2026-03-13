@@ -696,3 +696,50 @@ h6 {
     -webkit-backdrop-filter: blur(12px);
   }
 }
+
+/* ═════════ RESPONSIVE LAYOUT FIX ═════════ */
+
+.container-responsive {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 16px;
+}
+
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-padding {
+  padding: clamp(16px, 4vw, 48px);
+}
+
+.text-responsive-lg {
+  font-size: clamp(20px, 4vw, 40px);
+}
+
+.text-responsive-md {
+  font-size: clamp(16px, 2vw, 20px);
+}
+
+/* Navbar Responsive */
+
+@media (max-width: 900px) {
+
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-hamburger {
+    display: block !important;
+  }
+
+}

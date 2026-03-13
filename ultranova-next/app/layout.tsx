@@ -6,6 +6,7 @@ import PulseHeartbeat from './components/PulseHeartbeat'
 import ParticleCanvas from './components/ParticleCanvas'
 import NeoBrutalistBackground from './components/NeoBrutalistBackground'
 import Chatbot from './components/Chatbot'
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
 
@@ -25,19 +26,39 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body
         className={inter.className}
-        style={{ background: 'var(--deep-space)', color: 'var(--text-primary)', margin: 0, padding: 0 }}
+        style={{
+          background: 'var(--deep-space)',
+          color: 'var(--text-primary)',
+          margin: 0,
+          padding: 0,
+        }}
       >
         <ThemeProvider>
           <ParticleCanvas particleCount={100} interactive baseHue={260} />
           <NeoBrutalistBackground />
           <PulseHeartbeat />
+
           <TopNavBar />
-          <main style={{ position: 'relative', zIndex: 2, paddingTop: 64 }}>
+
+          {/* RESPONSIVE WRAPPER */}
+          <main
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              paddingTop: 80,
+              width: '100%',
+              maxWidth: '1200px',
+              margin: '0 auto',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+            }}
+          >
             {children}
           </main>
+
           <Chatbot />
         </ThemeProvider>
       </body>
-    </html >
+    </html>
   )
 }
