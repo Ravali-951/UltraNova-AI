@@ -23,31 +23,35 @@ export default function RoadmapPage() {
     const [activeMilestone, setActiveMilestone] = useState<string | null>('mvp')
     const [roadmapAI, setRoadmapAI] = useState<any>(null)
     const [idea] = useState("AI startup assistant")
-    const activeData = roadmapAI?.[activeMilestone] || MILESTONES.find((m) => m.id === activeMilestone)
 
-const getRoadmap = async () => {
-    try {
-        const res = await fetch("http://localhost:8000/founder/roadmap", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ idea })
-        })
+    const activeData =
+        activeMilestone && roadmapAI
+            ? roadmapAI[activeMilestone]
+            : MILESTONES.find((m) => m.id === activeMilestone)
 
-        const data = await res.json()
-        console.log("AI Roadmap:", data)
+    const getRoadmap = async () => {
+        try {
+            const res = await fetch("http://localhost:8000/founder/roadmap", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ idea })
+            })
 
-        setRoadmapAI(data)
+            const data = await res.json()
+            console.log("AI Roadmap:", data)
 
-    } catch (err) {
-        console.error("Roadmap AI error:", err)
+            setRoadmapAI(data)
+
+        } catch (err) {
+            console.error("Roadmap AI error:", err)
+        }
     }
-}
 
-useEffect(() => {
-    getRoadmap()
-}, [])
+    useEffect(() => {
+        getRoadmap()
+    }, [])
 
 
 
@@ -162,9 +166,9 @@ useEffect(() => {
                         <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <ConfidenceBar value={activeData?.technical_feasibility || 92} label="Technical Feasibility" color="#00A3FF" size="sm" />
 
-<ConfidenceBar value={activeData?.market_timing || 64} label="Market Timing" color="#FF6B3B" size="sm" />
+                            <ConfidenceBar value={activeData?.market_timing || 64} label="Market Timing" color="#FF6B3B" size="sm" />
 
-<ConfidenceBar value={activeData?.team_readiness || 85} label="Team Readiness" color="#00FF9D" size="sm" />
+                            <ConfidenceBar value={activeData?.team_readiness || 85} label="Team Readiness" color="#00FF9D" size="sm" />
                         </div>
                     </GlassPanel>
 
