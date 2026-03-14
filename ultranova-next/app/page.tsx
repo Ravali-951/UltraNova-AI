@@ -110,7 +110,7 @@ export default function Home() {
   return (
     <>
       {/* ═══════ HERO SECTION ═══════ */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 clamp(16px,4vw,48px)', overflow: 'hidden' }}>
         {/* Ambient gradient behind hero */}
 <div
   style={{
@@ -219,8 +219,8 @@ export default function Home() {
                 {/* Orb */}
                 <div
                   style={{
-                    width: 110,
-                    height: 110,
+                    width: 'clamp(80px,20vw,110px)',
+height: 'clamp(80px,20vw,110px)',
                     borderRadius: '50%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -257,7 +257,7 @@ export default function Home() {
                     top: '100%',
                     left: '50%',
                     transform: `translateX(-50%) translateY(${hoveredOrb === i ? 16 : 6}px)`,
-                    width: 200,
+                    width: 'min(200px,80vw)',
                     padding: '12px 16px',
                     background: '#0a0a0a',
                     backdropFilter: 'blur(20px)',

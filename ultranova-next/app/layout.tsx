@@ -24,6 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
       <body
         className={inter.className}
         style={{
@@ -42,17 +45,17 @@ export default function RootLayout({
 
           {/* RESPONSIVE WRAPPER */}
           <main
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              paddingTop: 80,
-              width: '100%',
-              maxWidth: '1200px',
-              margin: '0 auto',
-              paddingLeft: '16px',
-              paddingRight: '16px',
-            }}
-          >
+  style={{
+    position: 'relative',
+    zIndex: 2,
+    paddingTop: 80,
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    paddingLeft: 'clamp(16px,4vw,32px)',
+    paddingRight: 'clamp(16px,4vw,32px)',
+  }}
+>
             {children}
           </main>
 

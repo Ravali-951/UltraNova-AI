@@ -168,7 +168,14 @@ setAgentStates(updatedAgentStates);
                     <StatusBar runway={runway} confidence={confidence} />
 
                     {/* Main Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 16, minHeight: 'calc(100vh - 180px)' }}>
+                    <div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: 16,
+    minHeight: 'calc(100vh - 180px)'
+  }}
+>
                         {/* Agent Council (Left) */}
                         <GlassPanel glow style={{ padding: 20 }}>
                             <h2 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontFamily: "'Outfit', sans-serif", marginBottom: 20 }}>
@@ -260,7 +267,7 @@ setAgentStates(updatedAgentStates);
                                         <h2 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontFamily: "'Outfit', sans-serif", marginBottom: 8 }}>
                                             Decision Space
                                         </h2>
-                                        <h3 style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Outfit', sans-serif", color: 'var(--text-primary)' }}>
+                                        <h3 style={{ fontSize: 'clamp(16px,4vw,22px)', fontWeight: 700, fontFamily: "'Outfit', sans-serif", color: 'var(--text-primary)' }}>
                                             &ldquo;{decisionQuestion}&rdquo;
                                         </h3>
                                     </div>

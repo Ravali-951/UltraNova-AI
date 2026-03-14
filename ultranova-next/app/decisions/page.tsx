@@ -132,7 +132,7 @@ export default function DecisionsPage() {
                         </h1>
                         <p style={{ color: 'var(--text-muted)' }}>Every decision becomes a star. Click to revisit the moment.</p>
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap'}}>
                         {[{ key: null, label: 'All' }, { key: 'market', label: 'Market' }, { key: 'product', label: 'Product' }, { key: 'team', label: 'Team' }].map(({ key, label }) => (
                             <button key={label} onClick={() => setFilter(key)} style={{
                                 padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all 0.3s',
@@ -144,8 +144,8 @@ export default function DecisionsPage() {
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, minHeight: '70vh' }}>
-                    <GlassPanel glow style={{ minHeight: 500, position: 'relative' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, minHeight: '70vh' }}>
+                    <GlassPanel glow style={{ minHeight: 'clamp(320px, 60vh, 500px)', position: 'relative' }}>
                         <ConstellationCanvas decisions={filteredDecisions} selectedId={selectedId} onSelect={setSelectedId} />
                     </GlassPanel>
 
