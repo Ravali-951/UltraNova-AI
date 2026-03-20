@@ -1,6 +1,7 @@
 fastapi==0.104.1
 uvicorn==0.24.0
-sqlalchemy==2.0.23
+sqlalchemy==2.0.30
+greenlet==3.0.3
 python-dotenv==1.0.0
 resend
 groq
