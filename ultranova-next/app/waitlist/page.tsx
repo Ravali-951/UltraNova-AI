@@ -115,6 +115,8 @@ export default function WaitlistPage() {
     })
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [errorMsg, setErrorMsg] = useState('')
+    const [result, setResult] = useState<any>(null);
+    const [showResult, setShowResult] = useState(false);
 
     const filledFields = [
         formData.name.length > 0,
@@ -126,28 +128,38 @@ export default function WaitlistPage() {
 
     const roleColor = ROLES.find((r) => r.value === formData.role)?.color || '#6C3BFF'
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setStatus('loading')
-        setErrorMsg('')
-        try {
-            const response = await axios.post('http://localhost:8000/waitlist/join', {
-                name: formData.name, email: formData.email, role: formData.role,
-                idea_description: formData.idea_description, stage: formData.stage,
-            })
-            console.log('Success:', response.data)
-            setStatus('success')
-            setFormData({ name: '', email: '', role: '', idea_description: '', stage: '' })
-        } catch (error: any) {
+const handleSubmit = async (e: any) => {
+  e.preventDefault(); // ✅ VERY IMPORTANT
 
-    if (error.response) {
-        setErrorMsg(error.response.data.detail)
-    } else {
-        setErrorMsg("Something went wrong")
+  try {
+    setStatus("loading");
+
+    const res = await fetch("https://ultranova-ai-r9rx.onrender.com/waitlist/join", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+  name: formData.name,
+  email: formData.email,
+  role: formData.role,
+  idea_description: formData.idea_description,
+  stage: formData.stage,
+}),
+    });
+
+    if (!res.ok) {
+      throw new Error("API failed");
     }
 
-}
-    }
+    setStatus("success"); // ✅ THIS SHOWS "Beacon is Lit"
+
+  } catch (error) {
+    console.error(error);
+    setStatus("error");
+    setErrorMsg("Something went wrong");
+  }
+};
 
     const inputStyle: React.CSSProperties = {
         width: '100%',
@@ -181,6 +193,22 @@ export default function WaitlistPage() {
                         <p style={{ fontSize: 13, color: '#555577', marginBottom: 32 }}>
                             Check your email for confirmation and next steps.
                         </p>
+                        {showResult && result && (
+                            <div style={{
+                                marginTop: 20,
+                                padding: 16,
+                                background: "#111",
+                                borderRadius: 10,
+                                color: "white",
+                                textAlign: "left"
+                            }}>
+                                <h3>🧠 AI Analysis</h3>
+
+                                <pre style={{ whiteSpace: "pre-wrap", fontSize: 12 }}>
+                                    {JSON.stringify(result, null, 2)}
+                                </pre>
+                            </div>
+                        )}
                         <Link href="/" style={{ textDecoration: 'none' }}>
                             <GlowButton variant="outline">Return to Home</GlowButton>
                         </Link>
@@ -213,7 +241,7 @@ export default function WaitlistPage() {
                             ))}
                         </div>
 
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                        <form onSubmit={handleSubmit}>
                             {/* Name */}
                             <div>
                                 <label style={{ display: 'block', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#555577', marginBottom: 8 }}>Name</label>
@@ -299,3 +327,4 @@ export default function WaitlistPage() {
         </div>
     )
 }
+

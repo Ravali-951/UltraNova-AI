@@ -105,10 +105,38 @@ function RevealSection({ children, delay = 0, className = '' }: { children: Reac
 }
 
 export default function Home() {
+  const [idea, setIdea] = useState("");
+  const [result, setResult] = useState("");
   const [hoveredOrb, setHoveredOrb] = useState<number | null>(null)
+
+  const handleSubmit = async () => {
+  try {
+    const res = await fetch("https://ultranova-ai-r9rx.onrender.com/founder/think", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idea: idea,
+        business_id: "demo",
+        runway_months: 6,
+        product_clarity: 7,
+        features: [],
+      }),
+    });
+
+    const data = await res.json();
+    setResult(JSON.stringify(data, null, 2));
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
+
 
   return (
     <>
+
       {/* ═══════ HERO SECTION ═══════ */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 clamp(16px,4vw,48px)', overflow: 'hidden' }}>
         {/* Ambient gradient behind hero */}
@@ -305,9 +333,9 @@ height: 'clamp(80px,20vw,110px)',
             }}
           >
             <Link href="/waitlist" style={{ textDecoration: 'none' }}>
-              <GlowButton variant="primary" size="lg">
-                🚀 Get Early Access
-              </GlowButton>
+              <GlowButton  variant="primary" size="lg" onClick={handleSubmit}>
+  🚀 Get Early Access
+</GlowButton>
             </Link>
             <Link href="/console" style={{ textDecoration: 'none' }}>
               <GlowButton variant="outline" size="lg">

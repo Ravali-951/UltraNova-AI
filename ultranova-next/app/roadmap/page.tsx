@@ -23,6 +23,7 @@ export default function RoadmapPage() {
     const [activeMilestone, setActiveMilestone] = useState<string | null>('mvp')
     const [roadmapAI, setRoadmapAI] = useState<any>(null)
     const [idea] = useState("AI startup assistant")
+    const [roadmapData, setRoadmapData] = useState<any>(null);
 
     const activeData =
         activeMilestone && roadmapAI
@@ -31,7 +32,7 @@ export default function RoadmapPage() {
 
     const getRoadmap = async () => {
         try {
-            const res = await fetch("http://localhost:8000/founder/roadmap", {
+            const res = await fetch("https://ultranova-ai-r9rx.onrender.com/roadmap", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -40,14 +41,13 @@ export default function RoadmapPage() {
             })
 
             const data = await res.json()
-            console.log("AI Roadmap:", data)
 
-            setRoadmapAI(data)
+            setRoadmapData(data);
 
         } catch (err) {
-            console.error("Roadmap AI error:", err)
+            console.error(err);
         }
-    }
+    };
 
     useEffect(() => {
         getRoadmap()

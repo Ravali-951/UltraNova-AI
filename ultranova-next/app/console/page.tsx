@@ -44,121 +44,127 @@ export default function ConsolePage() {
     });
     const [runway, setRunway] = useState("18 months");
     const [confidence, setConfidence] = useState(82);
+    const [rawResult, setRawResult] = useState<any>(null);
 
-const handleThink = async () => {
-  try {
-    setIsThinking(true);
-    
-    const thoughtInput = inputValue || "AI app for students to find study partners";
-    
-    console.log('1. Sending idea to backend:', thoughtInput);
-    
-    const response = await fetch('http://localhost:8000/founder/think', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        idea: thoughtInput
-      })
-    });
+    const handleThink = async () => {
+        try {
+            setIsThinking(true);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+            const thoughtInput = inputValue || "AI app for students to find study partners";
 
-    const data = await response.json();
-    console.log('2. BACKEND RESPONSE RAW:', JSON.stringify(data, null, 2));
-    
-    // Transform the data to match your frontend format
-    const transformedData = {
-      agents: {
-        marketing: { 
-          status: "Active",
-          message: data.marketing?.message || "Analyzing market conditions...",
-          confidence: data.marketing?.confidence || 72,
-          actions: 3,
-          stance: data.marketing?.stance || "Analyzing"
-        },
-        product: { 
-          status: "Active",
-          message: data.product?.message || "Evaluating technical feasibility...",
-          confidence: data.product?.confidence || 68,
-          actions: 2,
-          stance: data.product?.stance || "Evaluating"
-        },
-        sales: { 
-          status: "Active",
-          message: data.sales?.message || "Identifying enterprise opportunities...",
-          confidence: data.sales?.confidence || 75,
-          actions: 4,
-          stance: data.sales?.stance || "Planning"
-        },
-        tech: { 
-          status: "Active",
-          message: data.tech?.message || "Running cost analysis...",
-          confidence: data.tech?.confidence || 88,
-          actions: 2,
-          stance: data.tech?.stance || "Calculating"
-        },
-        ops: { 
-          status: data.ops?.stance === "Ready" ? "Active" : "Idle",
-          message: data.ops?.message || "Monitoring all systems...",
-          confidence: data.ops?.confidence || 91,
-          actions: 1,
-          stance: data.ops?.stance || "Monitoring"
+            console.log('1. Sending idea to backend:', thoughtInput);
+
+            const response = await fetch('https://ultranova-ai-r9rx.onrender.com/founder/think', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idea: thoughtInput
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setRawResult(data);
+            console.log('2. BACKEND RESPONSE RAW:', JSON.stringify(data, null, 2));
+
+            // Transform the data to match your frontend format
+            const transformedData = {
+                agents: {
+                    marketing: {
+                        status: "Active",
+                        message: data.marketing?.message || "Analyzing market conditions...",
+                        confidence: data.marketing?.confidence || 72,
+                        actions: 3,
+                        stance: data.marketing?.stance || "Analyzing"
+                    },
+                    product: {
+                        status: "Active",
+                        message: data.product?.message || "Evaluating technical feasibility...",
+                        confidence: data.product?.confidence || 68,
+                        actions: 2,
+                        stance: data.product?.stance || "Evaluating"
+                    },
+                    sales: {
+                        status: "Active",
+                        message: data.sales?.message || "Identifying enterprise opportunities...",
+                        confidence: data.sales?.confidence || 75,
+                        actions: 4,
+                        stance: data.sales?.stance || "Planning"
+                    },
+                    tech: {
+                        status: "Active",
+                        message: data.tech?.message || "Running cost analysis...",
+                        confidence: data.tech?.confidence || 88,
+                        actions: 2,
+                        stance: data.tech?.stance || "Calculating"
+                    },
+                    ops: {
+                        status: data.ops?.stance === "Ready" ? "Active" : "Idle",
+                        message: data.ops?.message || "Monitoring all systems...",
+                        confidence: data.ops?.confidence || 91,
+                        actions: 1,
+                        stance: data.ops?.stance || "Monitoring"
+                    }
+                },
+                decision: {
+                    question: data.decision_question || "Should we build the analytics dashboard now?",
+                    options: data.options || DECISION_OPTIONS
+                },
+                runway: "18 months",
+                confidence: data.overall_confidence || 82
+            };
+
+            console.log('3. TRANSFORMED DATA:', transformedData);
+
+            // Update agentData
+            setAgentData(transformedData.agents);
+
+            // Update agentStates for the left panel
+            const updatedAgentStates = [
+                { type: 'marketing' as AgentType, status: (transformedData.agents.marketing.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.marketing.stance, message: transformedData.agents.marketing.message },
+                { type: 'product' as AgentType, status: (transformedData.agents.product.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.product.stance, message: transformedData.agents.product.message },
+                { type: 'sales' as AgentType, status: (transformedData.agents.sales.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.sales.stance, message: transformedData.agents.sales.message },
+                { type: 'tech' as AgentType, status: (transformedData.agents.tech.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.tech.stance, message: transformedData.agents.tech.message },
+                { type: 'ops' as AgentType, status: (transformedData.agents.ops.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.ops.stance, message: transformedData.agents.ops.message },
+            ];
+
+            setAgentStates(updatedAgentStates);
+
+            // Update decision data
+            setDecisionSpace(transformedData.decision);
+            setDecisionQuestion(transformedData.decision.question);
+
+            // Format options to match your DECISION_OPTIONS structure
+            if (transformedData.decision.options) {
+                const formattedOptions = transformedData.decision.options.map((opt: any, index: number) => ({
+                    label: opt.label || opt.title || `Option ${String.fromCharCode(65 + index)}`,
+                    risk: opt.risk || 30,
+                    confidence: opt.confidence || 70,
+                    color: index === 0 ? '#00A3FF' : index === 1 ? '#00FF9D' : '#FF6B3B'
+                }));
+                setDecisionOptions(formattedOptions);
+            }
+
+            // Update confidence and runway
+            setRunway(transformedData.runway);
+            setConfidence(transformedData.confidence);
+            setOverallConfidence(transformedData.confidence);
+
+        } catch (error) {
+            console.error('3. Error:', error);
+        } finally {
+            setIsThinking(false);
         }
-      },
-      decision: {
-        question: data.decision_question || "Should we build the analytics dashboard now?",
-        options: data.options || DECISION_OPTIONS
-      },
-      runway: "18 months",
-      confidence: data.overall_confidence || 82
     };
-    
-    console.log('3. TRANSFORMED DATA:', transformedData);
-    
-    // Update agentData
-    setAgentData(transformedData.agents);
-    
-    // Update agentStates for the left panel
-const updatedAgentStates = [
-  { type: 'marketing' as AgentType, status: (transformedData.agents.marketing.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.marketing.stance, message: transformedData.agents.marketing.message },
-  { type: 'product' as AgentType, status: (transformedData.agents.product.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.product.stance, message: transformedData.agents.product.message },
-  { type: 'sales' as AgentType, status: (transformedData.agents.sales.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.sales.stance, message: transformedData.agents.sales.message },
-  { type: 'tech' as AgentType, status: (transformedData.agents.tech.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.tech.stance, message: transformedData.agents.tech.message },
-  { type: 'ops' as AgentType, status: (transformedData.agents.ops.status === 'Active' ? 'active' : 'idle') as AgentStatus, stance: transformedData.agents.ops.stance, message: transformedData.agents.ops.message },
-];
 
-setAgentStates(updatedAgentStates);
-    
-    // Update decision data
-    setDecisionSpace(transformedData.decision);
-    setDecisionQuestion(transformedData.decision.question);
-    
-    // Format options to match your DECISION_OPTIONS structure
-    if (transformedData.decision.options) {
-      const formattedOptions = transformedData.decision.options.map((opt: any, index: number) => ({
-        label: opt.label || opt.title || `Option ${String.fromCharCode(65 + index)}`,
-        risk: opt.risk || 30,
-        confidence: opt.confidence || 70,
-        color: index === 0 ? '#00A3FF' : index === 1 ? '#00FF9D' : '#FF6B3B'
-      }));
-      setDecisionOptions(formattedOptions);
-    }
-    
-    // Update confidence and runway
-    setRunway(transformedData.runway);
-    setConfidence(transformedData.confidence);
-    setOverallConfidence(transformedData.confidence);
-    
-  } catch (error) {
-    console.error('3. Error:', error);
-  } finally {
-    setIsThinking(false);
-  }
-};
+    const bestOption = decisionOptions.reduce((a, b) =>
+        a.confidence > b.confidence ? a : b
+    );
 
     return (
         <div style={{ position: 'relative', minHeight: '100vh', padding: '24px 16px', zIndex: 2 }}>
@@ -169,13 +175,13 @@ setAgentStates(updatedAgentStates);
 
                     {/* Main Grid */}
                     <div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: 16,
-    minHeight: 'calc(100vh - 180px)'
-  }}
->
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                            gap: 16,
+                            minHeight: 'calc(100vh - 180px)'
+                        }}
+                    >
                         {/* Agent Council (Left) */}
                         <GlassPanel glow style={{ padding: 20 }}>
                             <h2 style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontFamily: "'Outfit', sans-serif", marginBottom: 20 }}>
@@ -190,7 +196,7 @@ setAgentStates(updatedAgentStates);
                                 }}>
                                     <AgentAvatar type="marketing" status={agentData.marketing.status === 'Active' ? 'active' : 'idle'} size="sm" />
                                     <p style={{ fontSize: 11, marginTop: 8, marginLeft: 52, lineHeight: 1.5, color: 'var(--text-muted)' }}>
-                                        {agentData.marketing.message || "Awaiting input..."}
+                                        💡 {agentData.marketing.message || "Analyzing..."}
                                     </p>
                                     <div style={{ marginLeft: 52, marginTop: 4, fontSize: 10, color: 'var(--text-muted-lighter)' }}>
                                         Confidence: {agentData.marketing.confidence}% • {agentData.marketing.actions} actions
@@ -205,7 +211,7 @@ setAgentStates(updatedAgentStates);
                                 }}>
                                     <AgentAvatar type="product" status={agentData.product.status === 'Active' ? 'active' : 'idle'} size="sm" />
                                     <p style={{ fontSize: 11, marginTop: 8, marginLeft: 52, lineHeight: 1.5, color: 'var(--text-muted)' }}>
-                                        {agentData.product.message || "Awaiting input..."}
+                                        💡 {agentData.product.message || "Analyzing..."}
                                     </p>
                                     <div style={{ marginLeft: 52, marginTop: 4, fontSize: 10, color: 'var(--text-muted-lighter)' }}>
                                         Confidence: {agentData.product.confidence}% • {agentData.product.actions} actions
@@ -220,7 +226,7 @@ setAgentStates(updatedAgentStates);
                                 }}>
                                     <AgentAvatar type="sales" status={agentData.sales.status === 'Active' ? 'active' : 'idle'} size="sm" />
                                     <p style={{ fontSize: 11, marginTop: 8, marginLeft: 52, lineHeight: 1.5, color: 'var(--text-muted)' }}>
-                                        {agentData.sales.message || "Awaiting input..."}
+                                        💡 {agentData.sales.message || "Analyzing..."}
                                     </p>
                                     <div style={{ marginLeft: 52, marginTop: 4, fontSize: 10, color: 'var(--text-muted-lighter)' }}>
                                         Confidence: {agentData.sales.confidence}% • {agentData.sales.actions} actions
@@ -235,7 +241,7 @@ setAgentStates(updatedAgentStates);
                                 }}>
                                     <AgentAvatar type="tech" status={agentData.tech.status === 'Active' ? 'active' : 'idle'} size="sm" />
                                     <p style={{ fontSize: 11, marginTop: 8, marginLeft: 52, lineHeight: 1.5, color: 'var(--text-muted)' }}>
-                                        {agentData.tech.message || "Awaiting input..."}
+                                        💡 {agentData.tech.message || "Analyzing..."}
                                     </p>
                                     <div style={{ marginLeft: 52, marginTop: 4, fontSize: 10, color: 'var(--text-muted-lighter)' }}>
                                         Confidence: {agentData.tech.confidence}% • {agentData.tech.actions} actions
@@ -250,7 +256,7 @@ setAgentStates(updatedAgentStates);
                                 }}>
                                     <AgentAvatar type="ops" status={agentData.ops.status === 'Active' ? 'active' : 'idle'} size="sm" />
                                     <p style={{ fontSize: 11, marginTop: 8, marginLeft: 52, lineHeight: 1.5, color: 'var(--text-muted)' }}>
-                                        {agentData.ops.message || "Awaiting input..."}
+                                        💡 {agentData.ops.message || "Analyzing..."}
                                     </p>
                                     <div style={{ marginLeft: 52, marginTop: 4, fontSize: 10, color: 'var(--text-muted-lighter)' }}>
                                         Confidence: {agentData.ops.confidence}% • {agentData.ops.actions} actions
@@ -270,6 +276,32 @@ setAgentStates(updatedAgentStates);
                                         <h3 style={{ fontSize: 'clamp(16px,4vw,22px)', fontWeight: 700, fontFamily: "'Outfit', sans-serif", color: 'var(--text-primary)' }}>
                                             &ldquo;{decisionQuestion}&rdquo;
                                         </h3>
+                                        {!inputValue && !isThinking && (
+                                            <div style={{
+                                                padding: 20,
+                                                borderRadius: 12,
+                                                textAlign: 'center',
+                                                opacity: 0.6
+                                            }}>
+                                                💭 Ask a startup question to begin
+                                            </div>
+                                        )}
+                                        <div style={{
+                                            padding: 16,
+                                            borderRadius: 12,
+                                            background: 'rgba(108,59,255,0.08)',
+                                            border: '1px solid rgba(108,59,255,0.2)',
+                                            marginTop: 12,
+                                            marginBottom: 20
+                                        }}>
+                                            <h4 style={{ fontSize: 12, color: '#aaa', marginBottom: 6 }}>
+                                                🧠 AI Insight
+                                            </h4>
+
+                                            <p style={{ fontSize: 14, lineHeight: 1.6 }}>
+                                                {decisionQuestion}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div style={{
                                         display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999,
@@ -282,6 +314,15 @@ setAgentStates(updatedAgentStates);
 
                                 {/* Decision Tree */}
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 28 }}>
+                                    <div style={{
+                                        padding: 14,
+                                        borderRadius: 12,
+                                        background: 'rgba(0,255,157,0.08)',
+                                        border: '1px solid rgba(0,255,157,0.3)',
+                                        marginBottom: 16
+                                    }}>
+                                        🏆 Recommended: <b>{bestOption.label}</b>
+                                    </div>
                                     {decisionOptions.map((opt, i) => {
                                         const isSelected = selectedOption === i
                                         const riskColor = opt.risk > 35 ? '#FF3B3B' : opt.risk > 20 ? '#FF6B3B' : '#00FF9D'
@@ -347,7 +388,7 @@ setAgentStates(updatedAgentStates);
                                         onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.boxShadow = 'none' }}
                                     />
                                     <GlowButton variant="primary" onClick={handleThink} disabled={isThinking || !inputValue.trim()}>
-                                        {isThinking ? '⚙️ Thinking...' : 'THINK ⚡'}
+                                        {isThinking ? '⚙️ AI Thinking...' : 'THINK ⚡'}
                                     </GlowButton>
                                 </div>
                             </GlassPanel>
