@@ -110,8 +110,9 @@
   --radius-xl: 0px;
 }
 
-html[data-theme="light"] * {
-  border-radius: 0px !important;
+/* Remove global border-radius reset to allow circular components like orbs to work */
+html[data-theme="light"] .neo-brutalist-block {
+    border-radius: 0px !important;
 }
 
 html[data-theme="light"] button,
@@ -127,7 +128,10 @@ html[data-theme="light"] .brutalist-card {
 
 html[data-theme="light"] .glass-panel,
 html[data-theme="light"] .glass-panel-glow,
-html[data-theme="light"] .brutalist-card {
+html[data-theme="light"] .brutalist-card,
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
   background-color: #ffffff !important;
 }
 
@@ -137,6 +141,21 @@ html[data-theme="light"] button:active {
 }
 
 /* Force text visibility */
+html[data-theme="light"] input:focus,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 4px 4px 0px 0px var(--primary) !important;
+  transform: translate(-1px, -1px);
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="light"] select::placeholder {
+  color: #666666 !important;
+  opacity: 1 !important;
+}
+
 html[data-theme="light"] p,
 html[data-theme="light"] span,
 html[data-theme="light"] h1,
@@ -506,8 +525,12 @@ h6 {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.neural-input::placeholder {
-  color: var(--text-muted);
+/* Global Placeholder Visibility (Dark Mode Default) */
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: #8888AA !important; /* var(--text-secondary) equivalent */
+  opacity: 0.7 !important;
 }
 
 .neural-input:focus {

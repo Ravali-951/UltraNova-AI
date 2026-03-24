@@ -37,37 +37,88 @@ export default function RoadmapPage() {
                     <p style={{ color: 'var(--text-secondary)' }}>Your living roadmap — click milestones to explore.</p>
                 </div>
 
-                {/* Timeline */}
-                <GlassPanel glow style={{ padding: 32, marginBottom: 24 }}>
-                    <div style={{ position: 'relative', marginBottom: 32 }}>
-                        <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
+                {/* Timeline Section */}
+                <GlassPanel glow style={{ padding: '40px 32px 48px', marginBottom: 32, position: 'relative' }}>
+                    <div style={{ position: 'relative', marginBottom: 48, padding: '0 14px' }}>
+                        {/* Background Line */}
                         <div style={{
-                            position: 'absolute', top: 0, left: 0, height: 3, borderRadius: 2,
-                            width: `${((MILESTONES.findIndex(m => m.id === activeMilestone) + 1) / MILESTONES.length) * 100}%`,
-                            background: 'linear-gradient(90deg, #6C3BFF, #00A3FF, #00FF9D)', boxShadow: '0 0 15px rgba(108, 59, 255, 0.3)',
-                            transition: 'width 0.7s ease',
+                            position: 'absolute', top: 11, left: 14, right: 14, height: 4,
+                            borderRadius: 4, background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }} />
+                        
+                        {/* Progress Line */}
+                        <div style={{
+                            position: 'absolute', top: 11, left: 14, height: 4, borderRadius: 4,
+                            width: `calc(${((MILESTONES.findIndex(m => m.id === activeMilestone)) / (MILESTONES.length - 1)) * 100}% - 0px)`,
+                            background: 'linear-gradient(90deg, #6C3BFF, #00A3FF, #00FF9D)',
+                            boxShadow: '0 0 20px rgba(108, 59, 255, 0.4), 0 0 40px rgba(0, 163, 255, 0.2)',
+                            transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                            zIndex: 1
                         }} />
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: -14 }}>
-                            {MILESTONES.map((m) => {
+                        {/* Milestones */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
+                            {MILESTONES.map((m, idx) => {
                                 const isActive = activeMilestone === m.id
+                                const currentIndex = MILESTONES.findIndex(ms => ms.id === activeMilestone)
+                                const isCompleted = idx <= currentIndex
+                                
                                 return (
-                                    <button key={m.id} onClick={() => setActiveMilestone(m.id)}
-                                        style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                                    <button 
+                                        key={m.id} 
+                                        onClick={() => setActiveMilestone(m.id)}
+                                        style={{ 
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', 
+                                            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                                            width: 80, // Fixed width for alignment consistency
+                                            margin: idx === 0 ? '0 0 0 -40px' : idx === MILESTONES.length - 1 ? '0 -40px 0 0' : '0',
+                                            boxShadow: 'none', // Kill global light mode shadow
+                                            transform: 'none', // Kill global light mode transform
+                                        }}
+                                    >
                                         <div style={{
-                                            width: isActive ? 28 : 22, height: isActive ? 28 : 22, borderRadius: '50%',
+                                            width: isActive ? 30 : 24, 
+                                            height: isActive ? 30 : 24, 
+                                            borderRadius: '50% !important', // Force circularity in light mode
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            background: isActive ? m.color : m.status === 'future' ? 'var(--hover-bg)' : 'var(--inner-card-bg)',
-                                            border: `2px solid ${isActive ? m.color : 'var(--border-subtle)'}`,
-                                            boxShadow: isActive ? `0 0 20px ${m.color}50` : 'none',
-                                            transition: 'all 0.35s ease',
+                                            background: isCompleted ? (isActive ? m.color : m.color + '40') : 'var(--inner-card-bg)',
+                                            border: isCompleted ? `2px solid ${m.color}` : '2px solid rgba(200,200,255,0.2)',
+                                            boxShadow: isActive ? `0 0 25px ${m.color}80, inset 0 0 10px rgba(255,255,255,0.4)` : 'none',
+                                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            position: 'relative',
+                                            marginTop: isActive ? -2 : 1,
+                                            zIndex: 5
                                         }}>
-                                            {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'white' }} />}
+                                            {isCompleted && !isActive && (
+                                                <div style={{ width: 6, height: 6, borderRadius: '50% !important', background: m.color }} />
+                                            )}
+                                            {isActive && (
+                                                <div style={{ width: 8, height: 8, borderRadius: '50% !important', background: 'white', boxShadow: '0 0 10px white' }} />
+                                            )}
                                         </div>
-                                        <span style={{ fontSize: 12, fontWeight: 700, marginTop: 10, color: isActive ? m.color : '#555577', fontFamily: "'Outfit', sans-serif", transition: 'color 0.3s' }}>
-                                            {m.label}
-                                        </span>
-                                        <span style={{ fontSize: 10, marginTop: 4, color: '#555577' }}>{m.time}</span>
+                                        
+                                        <div style={{ textAlign: 'center', marginTop: 16 }}>
+                                            <span style={{ 
+                                                display: 'block',
+                                                fontSize: 13, fontWeight: 700, 
+                                                color: isActive ? 'white' : '#8888AA', 
+                                                fontFamily: "'Outfit', sans-serif", 
+                                                transition: 'all 0.3s ease',
+                                                textShadow: isActive ? `0 0 10px ${m.color}60` : 'none'
+                                            }}>
+                                                {m.label}
+                                            </span>
+                                            <span style={{ 
+                                                display: 'block',
+                                                fontSize: 10, marginTop: 4, 
+                                                color: isActive ? m.color : '#555577',
+                                                fontWeight: 500,
+                                                letterSpacing: '0.05em'
+                                            }}>
+                                                {m.time}
+                                            </span>
+                                        </div>
                                     </button>
                                 )
                             })}
