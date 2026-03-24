@@ -1,16 +1,16 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import { ReactNode } from 'react'
 
-const variants = {
+const variants: Variants = {
     hidden: { opacity: 0, scale: 0.98 },
     enter: { 
         opacity: 1, 
         scale: 1,
         transition: { duration: 0.6, ease: "easeOut" }
     }
-} as any
+}
 
 export default function PageAnimate({ children }: { children: ReactNode }) {
     return (

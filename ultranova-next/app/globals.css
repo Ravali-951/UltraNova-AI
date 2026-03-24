@@ -526,9 +526,9 @@ h6 {
 }
 
 /* Global Placeholder Visibility (Dark Mode Default) */
-input::placeholder,
-textarea::placeholder,
-select::placeholder {
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder,
+html[data-theme="dark"] select::placeholder {
   color: #8888AA !important; /* var(--text-secondary) equivalent */
   opacity: 0.7 !important;
 }
