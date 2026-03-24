@@ -131,14 +131,43 @@ export default function Home() {
       window.removeEventListener('mousemove', handleMouse)
     }
   }, [])
+  const [idea, setIdea] = useState("");
+  const [result, setResult] = useState("");
+  const [hoveredOrb, setHoveredOrb] = useState<number | null>(null)
+
+  const handleSubmit = async () => {
+  try {
+    const res = await fetch("https://ultranova-ai-r9rx.onrender.com/founder/think", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idea: idea,
+        business_id: "demo",
+        runway_months: 6,
+        product_clarity: 7,
+        features: [],
+      }),
+    });
+
+    const data = await res.json();
+    setResult(JSON.stringify(data, null, 2));
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
+
 
   const isSmallMobile = viewportSize.width < 480
   const isTablet = viewportSize.width < 1024
 
   return (
     <>
+
       {/* ═══════ HERO SECTION ═══════ */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 clamp(16px,4vw,48px)', overflow: 'hidden' }}>
         {/* Ambient gradient behind hero */}
         <div
           style={{
@@ -155,6 +184,19 @@ export default function Home() {
             zIndex: 1,
           }}
         />
+<div
+  style={{
+    position: 'absolute',
+    width: 800,
+    height: 800,
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(108,59,255,0.08) 0%, transparent 70%)',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',  // Fixed position, no mouse tracking
+    pointerEvents: 'none',
+  }}
+/>
 
         <div style={{ position: 'relative', textAlign: 'center', maxWidth: 960, margin: '0 auto', zIndex: 3, padding: isSmallMobile ? '80px 0 40px' : '40px 0' }}>
           {/* Eyebrow */}
@@ -252,6 +294,8 @@ export default function Home() {
                   style={{
                     width: isSmallMobile ? 92 : 115,
                     height: isSmallMobile ? 92 : 115,
+                    width: 'clamp(80px,20vw,110px)',
+height: 'clamp(80px,20vw,110px)',
                     borderRadius: '50%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -296,7 +340,7 @@ export default function Home() {
                     top: '100%',
                     left: '50%',
                     transform: `translateX(-50%) translateY(${hoveredOrb === i ? 16 : 6}px)`,
-                    width: 200,
+                    width: 'min(200px,80vw)',
                     padding: '12px 16px',
                     background: '#0a0a0a',
                     backdropFilter: 'blur(20px)',
@@ -347,6 +391,9 @@ export default function Home() {
               <GlowButton variant="primary" size={isSmallMobile ? "md" : "lg"}>
                 🚀 Get Early Access
               </GlowButton>
+              <GlowButton  variant="primary" size="lg" onClick={handleSubmit}>
+  🚀 Get Early Access
+</GlowButton>
             </Link>
             <Link href="/console" style={{ textDecoration: 'none' }}>
               <GlowButton variant="outline" size={isSmallMobile ? "md" : "lg"}>

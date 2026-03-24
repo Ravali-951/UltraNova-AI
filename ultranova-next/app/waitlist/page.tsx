@@ -178,6 +178,8 @@ export default function WaitlistPage() {
     })
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [errorMsg, setErrorMsg] = useState('')
+    const [result, setResult] = useState<any>(null);
+    const [showResult, setShowResult] = useState(false);
 
     const filledFields = [
         formData.name.length > 0,
@@ -216,7 +218,38 @@ export default function WaitlistPage() {
             }
             setStatus('error')
         }
+const handleSubmit = async (e: any) => {
+  e.preventDefault(); // ✅ VERY IMPORTANT
+
+  try {
+    setStatus("loading");
+
+    const res = await fetch("https://ultranova-ai-r9rx.onrender.com/waitlist/join", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+  name: formData.name,
+  email: formData.email,
+  role: formData.role,
+  idea_description: formData.idea_description,
+  stage: formData.stage,
+}),
+    });
+
+    if (!res.ok) {
+      throw new Error("API failed");
     }
+
+    setStatus("success"); // ✅ THIS SHOWS "Beacon is Lit"
+
+  } catch (error) {
+    console.error(error);
+    setStatus("error");
+    setErrorMsg("Something went wrong");
+  }
+};
 
     const inputStyle: React.CSSProperties = {
         width: '100%',
@@ -247,6 +280,53 @@ export default function WaitlistPage() {
                             </h2>
                             <p style={{ fontSize: 16, color: 'var(--text-secondary)', marginBottom: 8 }}>
                                 You&apos;ve joined the constellation of founders.
+                    <GlassPanel glow style={{ padding: 48, textAlign: 'center' }}>
+                        <div style={{ marginBottom: 24 }}>
+                            <SignalCanvas formProgress={1} roleColor="rgba(0, 255, 157, 0.8)" />
+                        </div>
+                        <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 28, fontWeight: 700, color: '#00FF9D', marginBottom: 16 }}>
+                            Your Beacon is Lit 🌟
+                        </h2>
+                        <p style={{ fontSize: 16, color: 'var(--text-secondary)', marginBottom: 8 }}>
+                            You&apos;ve joined the constellation of founders.
+                        </p>
+                        <p style={{ fontSize: 13, color: '#555577', marginBottom: 32 }}>
+                            Check your email for confirmation and next steps.
+                        </p>
+                        {showResult && result && (
+                            <div style={{
+                                marginTop: 20,
+                                padding: 16,
+                                background: "#111",
+                                borderRadius: 10,
+                                color: "white",
+                                textAlign: "left"
+                            }}>
+                                <h3>🧠 AI Analysis</h3>
+
+                                <pre style={{ whiteSpace: "pre-wrap", fontSize: 12 }}>
+                                    {JSON.stringify(result, null, 2)}
+                                </pre>
+                            </div>
+                        )}
+                        <Link href="/" style={{ textDecoration: 'none' }}>
+                            <GlowButton variant="outline">Return to Home</GlowButton>
+                        </Link>
+                    </GlassPanel>
+                ) : (
+                    <GlassPanel glow style={{ padding: '36px 32px' }}>
+                        {/* Header */}
+                        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+                            <SignalCanvas formProgress={formProgress} roleColor={formData.role === '' ? 'rgba(108, 59, 255, 0.8)' : `${roleColor}`} />
+                            <h1 style={{
+                                fontFamily: "'Outfit', sans-serif", fontSize: 28, fontWeight: 700, marginBottom: 8,
+                                background: 'linear-gradient(135deg, #6C3BFF, #00A3FF)',
+                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                            }}>
+                                Create Your Neural Signature
+                            </h1>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                                Each field you fill strengthens your signal in the founder constellation.
                             </p>
                             <p style={{ fontSize: 13, color: '#555577', marginBottom: 32 }}>
                                 Check your email for confirmation and next steps.
@@ -323,6 +403,16 @@ export default function WaitlistPage() {
                                         </div>
                                     </div>
                                 </StaggerItem>
+                        <form onSubmit={handleSubmit}>
+                            {/* Name */}
+                            <div>
+                                <label style={{ display: 'block', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#555577', marginBottom: 8 }}>Name</label>
+                                <input type="text" placeholder="What should we call you?" style={inputStyle}
+                                    value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required
+                                    onFocus={(e) => { e.currentTarget.style.borderColor = '#6C3BFF'; e.currentTarget.style.boxShadow = '0 0 20px rgba(108,59,255,0.15)' }}
+                                    onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.boxShadow = 'none' }}
+                                />
+                            </div>
 
                                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                                     {/* Row 1: Name & Email */}
@@ -430,3 +520,4 @@ export default function WaitlistPage() {
         </div>
     )
 }
+

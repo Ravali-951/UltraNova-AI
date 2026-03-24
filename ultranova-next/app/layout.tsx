@@ -30,23 +30,48 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
       <body
         className={inter.className}
-        style={{ background: 'var(--deep-space)', color: 'var(--text-primary)', margin: 0, padding: 0 }}
+        style={{
+          background: 'var(--deep-space)',
+          color: 'var(--text-primary)',
+          margin: 0,
+          padding: 0,
+        }}
       >
         <ThemeProvider>
           <ParticleCanvas particleCount={100} interactive baseHue={260} />
           <NeoBrutalistBackground />
           <PulseHeartbeat />
+
           <TopNavBar />
           <main style={{ position: 'relative', zIndex: 2, paddingTop: 64 }}>
             <PageAnimate>
               {children}
             </PageAnimate>
+
+          {/* RESPONSIVE WRAPPER */}
+          <main
+  style={{
+    position: 'relative',
+    zIndex: 2,
+    paddingTop: 80,
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    paddingLeft: 'clamp(16px,4vw,32px)',
+    paddingRight: 'clamp(16px,4vw,32px)',
+  }}
+>
+            {children}
           </main>
+
           <Chatbot />
         </ThemeProvider>
       </body>
-    </html >
+    </html>
   )
 }
