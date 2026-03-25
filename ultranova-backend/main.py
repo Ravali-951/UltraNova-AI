@@ -10,7 +10,9 @@ from sqlalchemy import create_engine, Column, String, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import sqlite3
 import uuid
+
 
 load_dotenv()
 
@@ -37,6 +39,20 @@ def send_welcome_email(email, name):
 
 
 app = FastAPI()
+
+conn = sqlite3.connect("ultranova.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS waitlist_users (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    email TEXT
+)
+""")
+
+conn = sqlite3.connect("ultranova.db")
+cursor = conn.cursor()
 
 app.add_middleware(
     CORSMiddleware,
@@ -210,16 +226,21 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
     
-import sqlite3
 
-@app.get("/waitlist")
-def get_users():
+@app.post("/waitlist")
+def add_user(data: dict):
+    name = data.get("name")
+    email = data.get("email")
+
     conn = sqlite3.connect("ultranova.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name, email FROM waitlist_users")
-    users = cursor.fetchall()
+    cursor.execute(
+        "INSERT INTO waitlist_users (id, name, email) VALUES (?, ?, ?)",
+        (str(uuid.uuid4()), name, email)
+    )
 
+    conn.commit()
     conn.close()
 
-    return [{"name": u[0], "email": u[1]} for u in users]
+    return {"message": "User added"}
