@@ -229,6 +229,7 @@ if __name__ == "__main__":
 
 @app.post("/waitlist")
 def add_user(data: dict):
+    import sqlite3
     name = data.get("name")
     email = data.get("email")
 
@@ -244,3 +245,18 @@ def add_user(data: dict):
     conn.close()
 
     return {"message": "User added"}
+
+
+@app.get("/waitlist")
+def get_users():
+    import sqlite3
+
+    conn = sqlite3.connect("ultranova.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name, email FROM waitlist_users")
+    users = cursor.fetchall()
+
+    conn.close()
+
+    return [{"name": u[0], "email": u[1]} for u in users]
