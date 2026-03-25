@@ -209,3 +209,17 @@ async def founder_decision(request: ThinkRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+import sqlite3
+
+@app.get("/waitlist")
+def get_users():
+    conn = sqlite3.connect("ultranova.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name, email FROM waitlist_users")
+    users = cursor.fetchall()
+
+    conn.close()
+
+    return [{"name": u[0], "email": u[1]} for u in users]
