@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
+import { motion } from 'framer-motion'
 
 interface GlowButtonProps {
     children: ReactNode
@@ -18,25 +19,28 @@ const SIZE_STYLES = {
     lg: { padding: '18px 40px', fontSize: '17px' },
 }
 
-const VARIANT_BASE = {
+const VARIANTS = {
     primary: {
         background: 'linear-gradient(135deg, #6C3BFF, #4B0ECC)',
-        border: 'none',
-        color: 'white',
-        boxShadow: '0 0 30px rgba(108, 59, 255, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        color: '#FFFFFF',
+        shadow: '0 0 30px rgba(108, 59, 255, 0.3)',
+        hoverShadow: '0 0 50px rgba(108, 59, 255, 0.5), 0 0 100px rgba(108, 59, 255, 0.2)'
     },
     outline: {
-        background: 'rgba(108, 59, 255, 0.06)',
-        border: '1px solid rgba(108, 59, 255, 0.4)',
+        background: 'rgba(108, 59, 255, 0.05)',
+        border: '1px solid rgba(108, 59, 255, 0.3)',
         color: 'var(--text-primary)',
-        boxShadow: 'none',
+        shadow: '0 0 0px transparent',
+        hoverShadow: '0 0 30px rgba(108, 59, 255, 0.15)'
     },
     ghost: {
-        background: 'rgba(108, 59, 255, 0.08)',
-        border: '1px solid rgba(108, 59, 255, 0.15)',
+        background: 'transparent',
+        border: '1px solid transparent',
         color: 'var(--text-primary)',
-        boxShadow: 'none',
-    },
+        shadow: '0 0 0px transparent',
+        hoverShadow: '0 0 15px rgba(108, 59, 255, 0.1)'
+    }
 }
 
 export default function GlowButton({
@@ -48,40 +52,28 @@ export default function GlowButton({
     className = '',
     size = 'md',
 }: GlowButtonProps) {
-    const [hovered, setHovered] = useState(false)
-
-    const sizeStyle = SIZE_STYLES[size]
-    const variantStyle = VARIANT_BASE[variant]
-
-    const hoverScale = disabled ? 'scale(1)' : hovered ? 'translateY(-2px) scale(1.02)' : 'scale(1)'
-
-    const hoverShadow =
-        variant === 'primary' && hovered && !disabled
-            ? '0 0 50px rgba(108, 59, 255, 0.5), 0 4px 30px rgba(0, 0, 0, 0.4)'
-            : variant === 'outline' && hovered && !disabled
-                ? '0 0 30px rgba(108, 59, 255, 0.15)'
-                : variantStyle.boxShadow
-
-    const hoverBg =
-        variant === 'outline' && hovered && !disabled
-            ? 'rgba(108, 59, 255, 0.12)'
-            : variant === 'ghost' && hovered && !disabled
-                ? 'rgba(108, 59, 255, 0.15)'
-                : variantStyle.background
-
-    const hoverBorder =
-        variant === 'outline' && hovered && !disabled
-            ? '1px solid rgba(108, 59, 255, 0.6)'
-            : variantStyle.border
+    const v = VARIANTS[variant]
+    const s = SIZE_STYLES[size]
 
     return (
-        <button
+        <motion.button
             type={type}
             onClick={onClick}
             disabled={disabled}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
             className={className}
+            whileHover={disabled ? {} : { 
+                scale: 1.02, 
+                y: -2,
+                boxShadow: v.hoverShadow,
+                background: variant === 'outline' ? 'rgba(108, 59, 255, 0.1)' : v.background
+            }}
+            whileTap={disabled ? {} : { scale: 0.96, y: 0 }}
+            initial={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 15
+            }}
             style={{
                 position: 'relative',
                 display: 'inline-flex',
@@ -89,22 +81,27 @@ export default function GlowButton({
                 justifyContent: 'center',
                 gap: '8px',
                 fontWeight: 600,
-                borderRadius: '12px',
+                borderRadius: '14px',
                 cursor: disabled ? 'not-allowed' : 'pointer',
-                opacity: disabled ? 0.5 : 1,
-                transition: 'all 0.35s ease-out',
+                opacity: disabled ? 0.6 : 1,
                 fontFamily: "'Inter', system-ui, sans-serif",
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
-                ...sizeStyle,
-                background: hoverBg,
-                border: hoverBorder,
-                color: variantStyle.color,
-                boxShadow: hoverShadow,
-                transform: hoverScale,
+                ...s,
+                background: v.background,
+                border: v.border,
+                color: v.color,
+                boxShadow: v.shadow,
+                outline: 'none'
             }}
         >
-            {children}
-        </button>
+            <motion.div
+                initial={false}
+                animate={{ opacity: disabled ? 0.5 : 1 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+                {children}
+            </motion.div>
+        </motion.button>
     )
 }

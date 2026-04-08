@@ -6,6 +6,7 @@ import PulseHeartbeat from './components/PulseHeartbeat'
 import ParticleCanvas from './components/ParticleCanvas'
 import NeoBrutalistBackground from './components/NeoBrutalistBackground'
 import Chatbot from './components/Chatbot'
+import PageAnimate from './components/PageAnimate'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
@@ -15,6 +16,11 @@ export const metadata = {
   description:
     'UltraNova is an AI Founder Operating System. Five AI agents debate, decide, and defend your startup vision. Join the waitlist.',
   keywords: 'AI, startup, co-founder, founder OS, decision making, AI agents',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/logo.svg',
+  },
 }
 
 export default function RootLayout({
@@ -42,6 +48,10 @@ export default function RootLayout({
           <PulseHeartbeat />
 
           <TopNavBar />
+          <main style={{ position: 'relative', zIndex: 2, paddingTop: 64 }}>
+            <PageAnimate>
+              {children}
+            </PageAnimate>
 
           {/* RESPONSIVE WRAPPER */}
           <main

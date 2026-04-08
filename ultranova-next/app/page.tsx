@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useTheme } from './components/ThemeContext'
 import GlowButton from './components/GlowButton'
 import GlassPanel from './components/GlassPanel'
 
@@ -105,6 +106,31 @@ function RevealSection({ children, delay = 0, className = '' }: { children: Reac
 }
 
 export default function Home() {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  const [hoveredOrb, setHoveredOrb] = useState<number | null>(null)
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 })
+  const [viewportSize, setViewportSize] = useState({ width: 1200, height: 800 })
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight })
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    
+    const handleMouse = (e: MouseEvent) => {
+      setMouseOffset({
+        x: (e.clientX - window.innerWidth / 2) * 0.02,
+        y: (e.clientY - window.innerHeight / 2) * 0.02
+      })
+    }
+    window.addEventListener('mousemove', handleMouse)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('mousemove', handleMouse)
+    }
+  }, [])
   const [idea, setIdea] = useState("");
   const [result, setResult] = useState("");
   const [hoveredOrb, setHoveredOrb] = useState<number | null>(null)
@@ -134,12 +160,30 @@ export default function Home() {
 
 
 
+  const isSmallMobile = viewportSize.width < 480
+  const isTablet = viewportSize.width < 1024
+
   return (
     <>
 
       {/* ═══════ HERO SECTION ═══════ */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 clamp(16px,4vw,48px)', overflow: 'hidden' }}>
         {/* Ambient gradient behind hero */}
+        <div
+          style={{
+            position: 'absolute',
+            width: isTablet ? '120vw' : '800px',
+            height: isTablet ? '120vw' : '800px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(108,59,255,0.08) 0%, transparent 70%)',
+            left: '50%',
+            top: '50%',
+            transform: `translate(calc(-50% + ${mouseOffset.x}px), calc(-50% + ${mouseOffset.y}px))`,
+            transition: 'transform 0.3s ease-out',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
 <div
   style={{
     position: 'absolute',
@@ -154,16 +198,16 @@ export default function Home() {
   }}
 />
 
-        <div style={{ position: 'relative', textAlign: 'center', maxWidth: 960, margin: '0 auto', zIndex: 3 }}>
+        <div style={{ position: 'relative', textAlign: 'center', maxWidth: 960, margin: '0 auto', zIndex: 3, padding: isSmallMobile ? '80px 0 40px' : '40px 0' }}>
           {/* Eyebrow */}
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              padding: '8px 16px',
+              padding: isSmallMobile ? '6px 12px' : '8px 16px',
               borderRadius: 999,
-              marginBottom: 32,
+              marginBottom: isSmallMobile ? 24 : 32,
               background: 'rgba(108, 59, 255, 0.1)',
               border: '1px solid rgba(108, 59, 255, 0.2)',
               animation: 'fade-in-up 0.8s ease-out forwards',
@@ -172,7 +216,7 @@ export default function Home() {
             <div
               style={{ width: 8, height: 8, borderRadius: '50%', background: '#00FF9D', boxShadow: '0 0 8px rgba(0,255,157,0.5)' }}
             />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: isSmallMobile ? 11 : 13, color: 'var(--text-secondary)' }}>
               AI Founder Operating System — Now in Early Access
             </span>
           </div>
@@ -201,10 +245,10 @@ export default function Home() {
           <h2
             style={{
               fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(1.4rem, 3.5vw, 2.5rem)',
+              fontSize: 'clamp(1.2rem, 3.5vw, 2.5rem)',
               fontWeight: 500,
               color: 'var(--text-secondary)',
-              marginBottom: 24,
+              marginBottom: isSmallMobile ? 16 : 24,
               animation: 'fade-in-up 0.8s ease-out 0.25s backwards',
             }}
           >
@@ -214,11 +258,12 @@ export default function Home() {
           {/* Description */}
           <p
             style={{
-              fontSize: 17,
+              fontSize: isSmallMobile ? 15 : 17,
               lineHeight: 1.7,
               color: 'var(--text-secondary)',
               maxWidth: 600,
-              margin: '0 auto 48px',
+              padding: isSmallMobile ? '0 10px' : '0',
+              margin: isSmallMobile ? '0 auto 32px' : '0 auto 48px',
               animation: 'fade-in-up 0.8s ease-out 0.35s backwards',
             }}
           >
@@ -232,7 +277,7 @@ export default function Home() {
               display: 'flex',
               flexWrap: 'wrap',
               justifyContent: 'center',
-              gap: 32,
+              gap: isSmallMobile ? 12 : 32,
               marginBottom: 48,
               animation: 'fade-in-up 0.8s ease-out 0.45s backwards',
             }}
@@ -247,6 +292,8 @@ export default function Home() {
                 {/* Orb */}
                 <div
                   style={{
+                    width: isSmallMobile ? 92 : 115,
+                    height: isSmallMobile ? 92 : 115,
                     width: 'clamp(80px,20vw,110px)',
 height: 'clamp(80px,20vw,110px)',
                     borderRadius: '50%',
@@ -254,24 +301,32 @@ height: 'clamp(80px,20vw,110px)',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: `radial-gradient(circle at 40% 35%, ${orb.glow}, rgba(20,20,34,0.8) 70%)`,
-                    border: `1px solid ${hoveredOrb === i ? orb.color : 'rgba(255,255,255,0.06)'}`,
+                    // Use filled theme colors - significantly darker/richer in light mode as requested
+                    backgroundColor: isDark ? `${orb.color}25` : `${orb.color}48`,
+                    border: 'none', 
                     boxShadow: hoveredOrb === i
-                      ? `0 0 40px ${orb.glow}, inset 0 0 30px ${orb.glow}`
-                      : `0 0 15px ${orb.glow.replace('0.35', '0.1')}`,
-                    transform: hoveredOrb === i ? 'translateY(-8px) scale(1.08)' : 'translateY(0)',
-                    transition: 'all 0.5s ease',
+                      ? `0 15px 45px ${orb.glow}, inset 0 0 20px ${orb.glow}`
+                      : (isDark ? `0 8px 25px rgba(0,0,0,0.3)` : `0 10px 30px ${orb.color}15`),
+                    transform: hoveredOrb === i ? 'translateY(-10px) scale(1.1)' : 'translateY(0)',
+                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     animation: `float-heavy 4s ease-in-out infinite`,
                     animationDelay: `${i * 0.5}s`,
+                    backdropFilter: 'blur(8px)',
                   }}
                 >
-                  <span style={{ fontSize: 32, marginBottom: 4 }}>{orb.icon}</span>
+                  <span style={{ 
+                    fontSize: isSmallMobile ? 26 : 34, 
+                    marginBottom: 4,
+                    filter: isDark ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' : 'drop-shadow(0 4px 10px rgba(0,0,0,0.15))'
+                  }}>{orb.icon}</span>
                   <span
                     style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: orb.color,
+                      fontSize: isSmallMobile ? 11 : 13,
+                      fontWeight: 800,
+                      color: isDark ? 'white' : orb.color,
                       fontFamily: "'Outfit', sans-serif",
+                      letterSpacing: '0.02em',
+                      textShadow: isDark ? `0 2px 8px ${orb.color}80` : 'none'
                     }}
                   >
                     {orb.label}
@@ -333,40 +388,22 @@ height: 'clamp(80px,20vw,110px)',
             }}
           >
             <Link href="/waitlist" style={{ textDecoration: 'none' }}>
+              <GlowButton variant="primary" size={isSmallMobile ? "md" : "lg"}>
+                🚀 Get Early Access
+              </GlowButton>
               <GlowButton  variant="primary" size="lg" onClick={handleSubmit}>
   🚀 Get Early Access
 </GlowButton>
             </Link>
             <Link href="/console" style={{ textDecoration: 'none' }}>
-              <GlowButton variant="outline" size="lg">
+              <GlowButton variant="outline" size={isSmallMobile ? "md" : "lg"}>
                 🎥 See the Console
               </GlowButton>
             </Link>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 32,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 8,
-            animation: 'scroll-bounce 2s ease-in-out infinite',
-            zIndex: 3,
-          }}
-        >
-          <span style={{ fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-            Scroll to explore
-          </span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555577" strokeWidth="2">
-            <path d="M12 5v14M5 12l7 7 7-7" />
-          </svg>
-        </div>
+
       </section>
 
       {/* ═══════ BIG IDEA SECTION ═══════ */}
@@ -445,16 +482,17 @@ height: 'clamp(80px,20vw,110px)',
                   {/* Icon */}
                   <div
                     style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 12,
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%', // Strictly circular as requested
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: 24,
-                      background: feature.glowBg,
-                      border: `1px solid ${feature.color}30`,
+                      background: isDark ? feature.glowBg : `${feature.color}45`,
+                      border: 'none',
                       marginBottom: 16,
+                      boxShadow: isDark ? `0 0 20px ${feature.color}20` : `0 4px 12px ${feature.color}20`,
                     }}
                   >
                     {feature.icon}
@@ -508,94 +546,119 @@ height: 'clamp(80px,20vw,110px)',
       </section>
 
       {/* ═══════ HOW IT WORKS ═══════ */}
-      <section style={{ position: 'relative', padding: '80px 24px 100px', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', padding: '100px 24px 140px', overflow: 'hidden' }}>
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(180deg, transparent, rgba(108,59,255,0.02), transparent)',
+            background: isDark 
+              ? 'linear-gradient(180deg, transparent, rgba(108,59,255,0.03), transparent)'
+              : 'linear-gradient(180deg, transparent, rgba(108,59,255,0.02), transparent)',
             pointerEvents: 'none',
           }}
         />
-        <div style={{ maxWidth: 700, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 840, margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <RevealSection>
             <h2
               style={{
                 fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(1.6rem, 4vw, 2.5rem)',
+                fontSize: 'clamp(2rem, 5vw, 2.8rem)',
                 fontWeight: 700,
                 textAlign: 'center',
-                marginBottom: 8,
+                marginBottom: 16,
+                letterSpacing: '-0.02em',
+                color: 'var(--text-primary)'
               }}
             >
               How UltraNova Works
             </h2>
-            <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: 56 }}>
-              From idea to action in four steps.
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: 70, fontSize: 16 }}>
+              From initial spark to battle-hardened strategy in four phases.
             </p>
           </RevealSection>
 
           <div style={{ position: 'relative' }}>
-            {/* Vertical connecting line */}
-            <div
-              style={{
-                position: 'absolute',
-                left: 28,
-                top: 0,
-                bottom: 0,
-                width: 2,
-                background: 'linear-gradient(180deg, #6C3BFF, #00A3FF, #00FF9D, #FF6B3B)',
-                opacity: 0.2,
-                borderRadius: 1,
-              }}
-            />
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {/* Vertical connecting line - Theme adaptive */}
+            <div style={{ 
+              position: 'absolute', left: 40, top: 40, bottom: 40, width: 2, 
+              background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)', 
+              zIndex: 1 
+            }} />
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
               {HOW_IT_WORKS.map((item, i) => (
-                <RevealSection key={i} delay={i * 0.12}>
-                  <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-                    {/* Step number node */}
+                <RevealSection key={i} delay={i * 0.15}>
+                  <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', position: 'relative' }}>
+                    {/* Synchronized Step Node - Theme adaptive */}
                     <div
                       style={{
-                        width: 56,
-                        height: 56,
+                        width: 80,
+                        height: 80,
                         borderRadius: '50%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
-                        background: `radial-gradient(circle at 40% 35%, ${item.color}30, #141422 70%)`,
-                        border: `2px solid ${item.color}40`,
-                        boxShadow: `0 0 20px ${item.color}20`,
+                        backgroundColor: isDark ? 'rgba(10, 10, 15, 0.4)' : `${item.color}08`,
+                        border: isDark 
+                          ? `1.5px solid ${item.color}40` 
+                          : `1.5px solid ${item.color}80`, // Stronger border in light mode
+                        boxShadow: isDark 
+                          ? `0 0 30px ${item.color}15, inset 0 0 15px ${item.color}10` 
+                          : `0 4px 15px ${item.color}15`,
                         position: 'relative',
                         zIndex: 2,
+                        backdropFilter: 'blur(10px)'
                       }}
                     >
                       <span
                         style={{
-                          fontSize: 14,
-                          fontWeight: 700,
+                          fontSize: 16,
+                          fontWeight: 900,
                           color: item.color,
-                          fontFamily: "'Outfit', sans-serif",
+                          fontFamily: 'monospace',
+                          letterSpacing: '0.05em'
                         }}
                       >
                         {item.step}
                       </span>
+                      
+                      {/* Section line highlight */}
+                      {i < HOW_IT_WORKS.length - 1 && (
+                        <div style={{ 
+                          position: 'absolute', top: 80, width: 2, height: 32, 
+                          background: `linear-gradient(to bottom, ${item.color}, ${HOW_IT_WORKS[i+1].color})`,
+                          opacity: isDark ? 0.5 : 0.4 
+                        }} />
+                      )}
                     </div>
 
-                    <GlassPanel style={{ flex: 1, padding: 24 }}>
+                    <GlassPanel style={{ 
+                      flex: 1, 
+                      padding: '32px 40px', 
+                      border: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.03)',
+                      background: isDark ? 'var(--glass-bg)' : '#ffffff',
+                      boxShadow: isDark ? 'var(--glass-shadow)' : '0 10px 30px rgba(0,0,0,0.04)'
+                    }}>
                       <h3
                         style={{
-                          fontSize: 17,
+                          fontSize: 20,
                           fontWeight: 700,
                           fontFamily: "'Outfit', sans-serif",
-                          marginBottom: 6,
-                          color: '#F0F0FF',
+                          marginBottom: 10,
+                          color: 'var(--text-primary)',
+                          letterSpacing: '-0.01em'
                         }}
                       >
                         {item.title}
                       </h3>
-                      <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                      <p style={{ 
+                        fontSize: 15, 
+                        color: isDark ? 'rgba(255,255,255,0.5)' : '#4B5563', 
+                        lineHeight: 1.6, 
+                        margin: 0, 
+                        fontWeight: 400 
+                      }}>
                         {item.desc}
                       </p>
                     </GlassPanel>
